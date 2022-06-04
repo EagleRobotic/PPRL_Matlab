@@ -6,8 +6,8 @@ open_system(mdl)
 sampling = 0.01;
 
 %% load the scene data file generated from Driving Scenario Designer
-load('curveLowVel.mat');
-%load('USCity.mat');
+load('data/curveLowVel.mat');
+%load('data/USCity.mat');
 %refPose = [linspace(0,150,15);zeros(1,15)]';
 
 %% define reference points
@@ -153,7 +153,7 @@ if doTraining
     trainingStats = train(agent,env,trainOpts);
 else
     % Load pretrained agent for the example.
-    load('trained1.mat','agent')
+    load('savedAgents/trained1.mat','agent')
     disp("Have a nice day")
     simOpts = rlSimulationOptions('MaxSteps',maxsteps);
     experiences = sim(env,agent,simOpts);

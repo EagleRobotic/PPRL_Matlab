@@ -3,21 +3,21 @@ close all; clear; clc;
 %mdl = 'new_model';
 mdl = 'exercise_modelv2';
 open_system(mdl)
-sampling = 0.01;
+sampling = 0.1;
 
 %% load the scene data file generated from Driving Scenario Designer
-load('curveLowVel.mat');
-%load('USCity.mat');
+%load('data/curveLowVel.mat');
+load('data/USCity.mat');
 %refPose = [linspace(0,150,15);zeros(1,15)]';
 
 %% define reference points
-%refPose = data.ActorSpecifications(1,67).Waypoints;
-refPose = data.ActorSpecifications.Waypoints;
+refPose = data.ActorSpecifications(1,67).Waypoints;
+%refPose = data.ActorSpecifications.Waypoints;
 xRef = refPose(:,1);
 yRef = -refPose(:,2);
 
 X_o = refPose(1,1)+0; % initial vehicle x position
-Y_o = -refPose(1,2)+20; % initial vehicle y position
+Y_o = -refPose(1,2)+0; % initial vehicle y position
 psi_o = 0; % initial yaw angle
 
 dx = abs(X_o - xRef);  % distance to all waypoints at the current time
@@ -181,7 +181,8 @@ if doTraining
     save("savedAgents/finalAgentSAC.mat",'agent')
 else
     % Load pretrained agent for the example.
-    load('savedAgents/finalAgentSAC.mat','agent')
+    %load('savedAgents/finalAgentSAC.mat','agent')
+    load('savedAgents/trained1.mat','agent')
     disp("Have a nice day")
     simOpts = rlSimulationOptions('MaxSteps',maxsteps);
     experiences = sim(env,agent,simOpts);
