@@ -6,13 +6,13 @@ open_system(mdl)
 sampling = 0.1;
 
 %% load the scene data file generated from Driving Scenario Designer
-%load('data/curveLowVel.mat');
-load('data/USCity.mat');
+load('data/curveLowVel.mat');
+%load('data/USCity.mat');
 %refPose = [linspace(0,150,15);zeros(1,15)]';
 
 %% define reference points
-refPose = data.ActorSpecifications(1,67).Waypoints;
-%refPose = data.ActorSpecifications.Waypoints;
+%refPose = data.ActorSpecifications(1,67).Waypoints;
+refPose = data.ActorSpecifications.Waypoints;
 xRef = refPose(:,1);
 yRef = -refPose(:,2);
 
@@ -57,12 +57,15 @@ ld = 5; % lookahead distance
 
 %% RL Spesifications
 
-obsInfo = rlNumericSpec([2 1]);
+obsInfo = rlNumericSpec([3 1]);
 obsInfo.Name = 'observations';
-obsInfo.Description = 'Integrated CTE and CTE';
+obsInfo.Description = 'Integrated CTE, CTE, velocity';
 
-actInfo = rlNumericSpec([1 1],'LowerLimit',0.5,'UpperLimit',50);
-actInfo.Name = 'LD Parameter';
+actInfo = rlNumericSpec([2 1], ...
+                        'LowerLimit',0.5,'UpperLimit',50, ...
+                        'LowerLimit',1,'UpperLimit',15);
+
+actInfo.Name = 'LD Parameter and velocity';
 
 agentBlk = [mdl '/RL Agent'];
 env = rlSimulinkEnv(mdl,agentBlk, obsInfo, actInfo);
@@ -167,9 +170,9 @@ trainOpts = rlTrainingOptions(...
     'Verbose',true, ...
     'Plots','training-progress',...
     'UseParallel',false,...
-    'SaveAgentCriteria',"AverageReward",'SaveAgentValue',-25,...
+    'SaveAgentCriteria',"AverageReward",'SaveAgentValue',-1500,...
     'StopTrainingCriteria','AverageReward',...
-    'StopTrainingValue',-2500);
+    'StopTrainingValue',-1500);
 
 trainOpts.ParallelizationOptions.Mode = "async";
 
@@ -178,11 +181,11 @@ doTraining = false;
 if doTraining
     % Train the agent.
     trainingStats = train(agent,env,trainOpts);
-    save("savedAgents/finalAgentSAC.mat",'agent')
+    save("savedAgents/finalAgentSACv2.mat",'agent')
 else
     % Load pretrained agent for the example.
     %load('savedAgents/finalAgentSAC.mat','agent')
-    load('savedAgents/trained1.mat','agent')
+    load("savedAgents/finalAgentSACv2.mat",'agent')
     disp("Have a nice day")
     simOpts = rlSimulationOptions('MaxSteps',maxsteps);
     experiences = sim(env,agent,simOpts);
@@ -208,9 +211,9 @@ scatter(yRef,xRef,'green','filled')
 function in = localResetFcn(in)
 
 in = setVariable(in,'X_o', randi(100,1,1)-200);
-in = setVariable(in,'vel', 7+randi(5,1,1));
+in = setVariable(in,'Y_o', randi(50,1,1)-20);
+in = setVariable(in,'vel', randi(15,1,1));
 in = setVariable(in,'psi_o', 1.57*(-1 + 2*rand(1,1)));
 in = setVariable(in,'ld', rand(1,1));
-%in = setVariable(in,'vel', 1);
 
 end

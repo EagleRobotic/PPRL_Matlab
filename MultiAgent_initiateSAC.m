@@ -6,13 +6,13 @@ load_system(mdl)
 sampling = 0.1;
 
 %% load the scene data file generated from Driving Scenario Designer
-%load('data/curveLowVel.mat');
-load('data/USCity.mat');
+load('data/curveLowVel.mat');
+%load('data/USCity.mat');
 %refPose = [linspace(0,150,15);zeros(1,15)]';
 
 %% define reference points
-refPose = data.ActorSpecifications(1,67).Waypoints;
-%refPose = data.ActorSpecifications.Waypoints;
+%refPose = data.ActorSpecifications(1,67).Waypoints;
+refPose = data.ActorSpecifications.Waypoints;
 xRef = refPose(:,1);
 yRef = -refPose(:,2);
 
@@ -102,7 +102,7 @@ trainOpts = rlTrainingOptions(...
     'Plots','training-progress',...
     'UseParallel',false,...
     'StopTrainingCriteria','AverageReward',...
-    'StopTrainingValue',[-2500,-2500]);
+    'StopTrainingValue',[-1500,-1000]);
 
 trainOpts.ParallelizationOptions.Mode = "async";
 
