@@ -1,0 +1,11 @@
+################ window 50 episode ################
+
+Gain:1 --- Acceleration ----- > mean = -1500
+Gain:1 --- Time ----- > mean = -4500
+Gain:1 --- CTE ----- > mean = 
+Gain:1 --- CTE_Dot ----- > mean = 
+Gain:1 --- LD ----- > mean = 
+
+
+$------ EOF -------$
+

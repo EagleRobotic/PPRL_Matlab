@@ -2,10 +2,10 @@ close all; clear; clc;
 
 %mdl = 'new_model';
 mdl = 'exercise_modelv2';
-open_system(mdl)
+load_system(mdl)
 sampling = 0.1;
 
-doTraining = false;
+doTraining = true;
 
 %% load the scene data file generated from Driving Scenario Designer
 load('data/curveLowVel.mat');
@@ -53,7 +53,7 @@ xteInt = sqrt((cnormal_xRef(idxc(1))-X_o)^2+(cnormal_yRef(idxc(1))-Y_o)^2);
 
 %% define reference time for plotting 
 s = size(xRef);
-Ts = 100; % simulation time
+Ts = 75; % simulation time
 data.StopTime = Ts;
 tRef = (linspace(0,Ts,s(1)))'; % this time variable is used in the "2D Visualization" block for plotting the reference points. 
 
@@ -167,7 +167,7 @@ maxsteps = ceil(Ts/sampling);
 trainOpts = rlTrainingOptions(...
     'MaxEpisodes',maxepisodes, ...
     'MaxStepsPerEpisode',maxsteps, ...
-    'ScoreAveragingWindowLength',100, ...
+    'ScoreAveragingWindowLength',50, ...
     'Verbose',true, ...
     'Plots','training-progress',...
     'UseParallel',false,...
@@ -186,27 +186,20 @@ else
     %load('savedAgents/finalAgentSAC.mat','agent')
     load("savedAgents/finalAgentSACv2.mat",'agent')
     disp("Model is loaded to the agent..")
-    %% Run simulation
-    %simOpts = rlSimulationOptions('MaxSteps',maxsteps);
-    %experiences = sim(env,agent,simOpts);
-    out = sim(mdl);
-    scatter(yRef,xRef,'green','filled')
 end
 
-%% Validate the trained agent
+%% Run simulation Validate the trained agent
 
-% simOpts = rlSimulationOptions('MaxSteps',maxsteps);
-% experiences = sim(env,agent,simOpts);
+simOpts = rlSimulationOptions('MaxSteps',maxsteps);
+experiences = sim(env,agent,simOpts);
+out = sim(mdl);
+scatter(yRef,xRef,'green','filled')
+
 % actor = getActor(agent);
 % parameters = getLearnableParameters(actor);
 % 
 % Ld = abs(parameters{1}(1));
 %Kp = abs(parameters{1}(2));
-
-
-
-
-
 
 
 function in = localResetFcn(in)
