@@ -2,7 +2,7 @@ close all; clear; clc;
 
 %mdl = 'new_model';
 mdl = 'exercise_modelv2';
-open_system(mdl)
+load_system(mdl)
 sampling = 0.1;
 
 %% load the scene data file generated from Driving Scenario Designer
