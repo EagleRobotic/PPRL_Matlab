@@ -57,13 +57,12 @@ ld = 5; % lookahead distance
 
 %% RL Spesifications
 
-obsInfo = rlNumericSpec([3 1]);
+obsInfo = rlNumericSpec([2 1]);
 obsInfo.Name = 'observations';
-obsInfo.Description = 'Integrated CTE, CTE, velocity';
+obsInfo.Description = 'Integrated CTE, CTE';
 
-actInfo = rlNumericSpec([2 1], ...
-                        'LowerLimit',0.5,'UpperLimit',50, ...
-                        'LowerLimit',1,'UpperLimit',15);
+actInfo = rlNumericSpec([1 1], ...
+                        'LowerLimit',0.5,'UpperLimit',50);
 
 actInfo.Name = 'LD Parameter and velocity';
 
@@ -210,8 +209,8 @@ scatter(yRef,xRef,'green','filled')
 
 function in = localResetFcn(in)
 
-in = setVariable(in,'X_o', randi(100,1,1)-200);
-in = setVariable(in,'Y_o', randi(50,1,1)-20);
+%in = setVariable(in,'X_o', randi(100,1,1)-200);
+%in = setVariable(in,'Y_o', randi(50,1,1)-20);
 in = setVariable(in,'vel', randi(15,1,1));
 in = setVariable(in,'psi_o', 1.57*(-1 + 2*rand(1,1)));
 in = setVariable(in,'ld', rand(1,1));
