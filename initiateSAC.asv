@@ -1,40 +1,32 @@
 close all; clear; clc;
 
 %mdl = 'new_model';
-mdl = 'exercise_modelv3';
+mdl = 'exercise_modelv2';
 load_system(mdl)
 sampling = 0.1;
 
-% Dynamic Bicycle Model %
-
-C_af	= 7.022229168947745e+04;    %Front Wheel Cornering Stiffness
-C_ar	= 9.998648482671748e+04;    %Rear Wheel Cornering Stiffness
-
-l_f     = 1.5;
-l_r     = 1.5;
-
-m       = 1600;                     %Vehicle Mass
-I_z     = 3.031179095852385e+03;    %Moment of inertia about z axis
-
-
-
 %% load the scene data file generated from Driving Scenario Designer
-load('data/curveLowVel.mat');
-%load('data/test_track3.mat');
+%load('data/curveLowVel.mat');
+load('data/test_track.mat');
 %load('data/USCity.mat');
 %refPose = [linspace(0,150,15);zeros(1,15)]';
 
 %% define reference points
 %refPose = data.ActorSpecifications(1,67).Waypoints;
 %refPose = data.RoadSpecifications.Centers;
+waypoints = data.RoadSpecifications.Centers;
+dubinsSpace = stateSpaceDubins([min(waypoints(:,1)) max(waypoints(:,1)); min(waypoints(:,2)) max(waypoints(:,2)); 0 0]);
+pathobj = navPath(dubinsSpace);
+append(pathobj, waypoints);
+interpolate(pathobj, 250);
 
-refPose = data.ActorSpecifications.Waypoints;
-xRef = refPose(:,1);
-yRef = refPose(:,2);
+% refPose = data.ActorSpecifications.Waypoints;
+xRef = pathobj.States(:,1);
+yRef = -pathobj.States(:,2);
 
-X_o = refPose(1,1)+0; % initial vehicle x position
-Y_o = refPose(1,2)+0; % initial vehicle y position
-psi_o = deg2rad(data.ActorSpecifications.Yaw); % initial yaw angle
+X_o = pathobj.States(:,1)+0; % initial vehicle x position
+Y_o = -refPose(1,2)+0; % initial vehicle y position
+psi_o = 0; % initial yaw angle
 
 dx = abs(X_o - xRef);  % distance to all waypoints at the current time
 dy = abs(Y_o - yRef);
@@ -61,13 +53,13 @@ xteInt = sqrt((cnormal_xRef(idxc(1))-X_o)^2+(cnormal_yRef(idxc(1))-Y_o)^2);
 
 %% define reference time for plotting 
 s = size(xRef);
-Ts = 20; % simulation time
+Ts = 100; % simulation time
 data.StopTime = Ts;
 tRef = (linspace(0,Ts,s(1)))'; % this time variable is used in the "2D Visualization" block for plotting the reference points. 
 
 %% define parameters used in the models
 %max vel 15
-vel = 15; %m/s 
+vel = 5; %m/s 
 L = 3; % bicycle length
 ld = 5; % lookahead distance
 
@@ -191,7 +183,7 @@ trainOpts = rlTrainingOptions(...
 
 trainOpts.ParallelizationOptions.Mode = "async";
 
-doTraining = false;
+doTraining = true;
 
 if doTraining
     % Train the agent.
